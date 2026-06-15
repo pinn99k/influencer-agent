@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>AI 기획사 · 인플루언서 에이전트</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<!-- MVC layers — load order matters (config -> api -> store -> views -> main) -->
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script src="model.js"></script>
+<script src="actions.js"></script>
+<script src="views.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

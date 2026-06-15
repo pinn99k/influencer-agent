@@ -1,0 +1,31 @@
+### Secrets — never commit real keys ###
+.env
+*.env
+src/.env
+!src/.env.example
+!.env.example
+
+### Runtime outputs (contains personal data) ###
+src/outputs/
+
+### E2E result dumps ###
+_e2e_*.txt
+src/_e2e_*.txt
+
+### Cache ###
+src/.cache/
+.cache/
+
+### AI dev-internal (not for public repo) ###
+.claude/
+
+### Python ###
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+### System ###
+.DS_Store
+Thumbs.db
+desktop.ini
