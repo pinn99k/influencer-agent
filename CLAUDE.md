@@ -16,11 +16,6 @@
 7. docs/refs/실전적용_로드맵.md          ← 성공 기준·시스템 확장·4주 계획 (필독)
 8. 해당 step 폴더 로드 (docs/workflow/step{N}_{이름}/)
 
-# 필요 시만 지연 로드 (참고용 — 덮어쓰기 금지):
-# task_08_인플루언서에이전트/인플루언서에이전트_MVP.md
-# task_08_인플루언서에이전트/인플루언서_에이전트_최종목표.md
-# task_08_인플루언서에이전트/조직구조_설계.md
-# task_08_인플루언서에이전트/워크스페이스_구조.md
 
 ## Success
 # 원칙: MVP부터 실제 사람에게 적용 — 품질 기준 타협 없음
@@ -81,7 +76,6 @@ read_before_impl:
   (이유: 미검증 지휘층 위에 부서 추가 금지. 상세 → docs/refs/확장_로드맵.md 트랙 0)
 - 회장 보고 조건 단독 결정 금지 (이유: 비용·법적·실행 전환은 반드시 핑구 승인)
 - 파일 작성·변경 전 내용 요약 → 핑구 승인 후 작성 (이유: 방향 오류 사전 차단)
-- task_08 기존 파일 덮어쓰기 금지 (이유: 참고용 — step 폴더에 새로 작성)
 - 세션 종료 시 ADR·review 반드시 작성 (이유: 결정사항 누락 방지)
 - 한글 포함 파일은 Edit/Write/PowerShell 금지 → Python write_text(encoding="utf-8") 전용 (이유: CJK 코드포인트 혼입, 세부 규칙 → .claude/lessons.md)
 - 실행 전 원인 분석 먼저 — 같은 파일 3회 이상 재작성 시 즉시 중단 후 근본 원인 파악
@@ -109,7 +103,6 @@ read_before_impl:
 │   │   │   └── 하위에이전트/          ← 직무 에이전트 4개 설계
 │   │   ├── step5_기술결정/
 │   │   ├── step6_아키텍처/
-│   │   ├── step7_구현/
 │   │   ├── step8_루프/
 │   │   └── step9_배포/
 │   ├── adr/
@@ -146,7 +139,6 @@ read_before_impl:
                 ├── prompts/      ← Spiral 0-A 전용
                 └── logs/         ← UI 실시간 표시용 (.jsonl)
 
-task_08_인플루언서에이전트/       ← 참고용 (수정 금지)
 ```
 
 ## Workflow
@@ -158,7 +150,6 @@ task_08_인플루언서에이전트/       ← 참고용 (수정 금지)
 - step4:   @docs/workflow/step4_기능명세/
 - step5:   @docs/workflow/step5_기술결정/
 - step6:   @docs/workflow/step6_아키텍처/
-- step7:   @docs/workflow/step7_구현/
 - step8:   @docs/workflow/step8_루프/
 - step9:   @docs/workflow/step9_배포/
 
@@ -166,7 +157,6 @@ task_08_인플루언서에이전트/       ← 참고용 (수정 금지)
 - 프로젝트 비전:  @docs/refs/비전.md                 ← 방향 잃었을 때 여기 (한 파일 요약)
 - AI 학습자료:    @docs/refs/AI_학습자료.md          ← LLM·에이전트 기초 개념 (핑구용)
 - 에이전트 설계:  @docs/refs/에이전트_설계원칙.md     ← 시스템 프롬프트 작성 기준 (Claude용)
-- 조직구조:       @task_08_인플루언서에이전트/조직구조_설계.md
 - MVP범위:        @docs/workflow/step3_MVP범위/MVP범위.md
 - 최종목표:       @docs/workflow/step3_MVP범위/최종목표.md
 - 워크스페이스:   @docs/workflow/step4_기능명세/워크스페이스_구조.md
