@@ -21,9 +21,17 @@
 
 ![관리 대시보드](docs/assets/dashboard.png)
 
-**대화형 인터뷰로 시작** (또는 `--legacy` 폼 입력)
+**대화형 인터뷰** — CEO가 질문하며 정보를 모으고, 우측에서 실시간으로 필드를 추출한다
 
-![대화형 인터뷰](docs/assets/interview.png)
+![대화형 인터뷰](docs/assets/chat.png)
+
+**결과 산출물** — 컨셉 3종 · 영상 아이디어 5개 · 4주 캘린더 · 해시태그 (산출물 5종)
+
+![결과 산출물](docs/assets/output.png)
+
+**재분석 입력** — 성과·피드백·측정 기록을 넣으면 CEO가 어떤 분석을 다시 돌릴지 판단해 부분 재실행
+
+![재분석 입력](docs/assets/reanalyze.png)
 
 ---
 
