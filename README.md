@@ -15,6 +15,16 @@
 - 인터페이스: CLI + 웹(FastAPI + SSE)
 - 테스트: 392 passing (391 + 1 live test skipped without API key)
 
+### 미리보기
+
+**관리 대시보드** — 이번 주 할 일 · 4주 로드맵 · 산출물 · 매니저 알림 (실시간 SSE)
+
+![관리 대시보드](docs/assets/dashboard.png)
+
+**대화형 인터뷰로 시작** (또는 `--legacy` 폼 입력)
+
+![대화형 인터뷰](docs/assets/interview.png)
+
 ---
 
 ## 1. 개요
