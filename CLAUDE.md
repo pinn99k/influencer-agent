@@ -1,20 +1,17 @@
 # Project: 인플루언서 에이전트
 # AI 기획사 — 에이전트 조직이 인플루언서 전략·기획·분석을 대신한다
 # goal: portfolio + production (실제 인플루언서 적용 → 구독자 수 성장 측정)
-# 역할 주의: 이 저장소를 만드는 주체는 Claude(개발자)다. CEO·매니저·워커는 모두
-# 개발·검증 대상이다. 회장 보고·자율 루프·매니저 알림은 '내가 따르는 규칙'이 아니라
-# '내가 구현하고 검증하는 시스템의 명세'다.
+# 개발 방식: 문제 정의·아키텍처·기술 결정(ADR 35건)은 직접 했고, 구현은 AI(Claude)를 페어
+# 프로그래밍 파트너로 활용했다. AI가 만든 코드에도 동일한 검증 규율(테스트·출력 검증 레이어·
+# 실 LLM e2e)을 적용했다 — "통과 != 검증"은 코드뿐 아니라 AI 산출물에도.
+# 용어: 'CEO/매니저/워커/회장'은 제품 안의 에이전트 역할이지 개발 조직이 아니다.
 
-## session_start
-# 새 세션 시작 시 아래 순서대로 읽어라. 읽기 전 작업 시작 금지.
-1. .claude/AIEngineering.md              ← 규칙·트리거 내면화
-2. .claude/personalization.md            ← 사용자 프로필
-3. .claude/lessons.md                   ← 반복 금지 패턴 (파일 작성·테스트·프로세스 규칙)
-4. docs/workflow/status.md               ← 현재 step + 다음 시작점
-5. status.md "현재 세션 포커스" 업데이트
-6. docs/refs/에이전트_설계원칙.md        ← 에이전트 프롬프트 작성 전 반드시 읽기
-7. docs/refs/실전적용_로드맵.md          ← 성공 기준·시스템 확장·4주 계획 (필독)
-8. 해당 step 폴더 로드 (docs/workflow/step{N}_{이름}/)
+## 개발 컨텍스트 (작업 전 참조)
+# 인간 개발자 + AI 페어가 공유하는 프로젝트 컨텍스트 노트.
+1. docs/workflow/status.md               <- 현재 단계 + 다음 시작점
+2. docs/refs/에이전트_설계원칙.md        <- 에이전트 프롬프트 작성 기준
+3. docs/refs/실전적용_로드맵.md          <- 성공 기준·확장·4주 계획
+4. 해당 단계 폴더 (docs/workflow/step{N}_{이름}/)
 
 
 ## Success
@@ -48,10 +45,10 @@
 - reanalyze: `cd src && python main.py --reanalyze --name {이름}`  ← 성과기반 재분석
 - run dry:   `cd src && python main.py --dry-run`      ← API 없이 프롬프트 파일 출력
 - web:       `cd src && python -m uvicorn api.main:app --port 8000`  ← 웹 UI (인터뷰·대시보드)
-- test:      `cd src && python -m pytest -q`           ← 전체 테스트 (세션 28: 232 pass)
+- test:      `cd src && python -m pytest -q`           ← 전체 테스트 (392 pass)
 
-## Claude Code 전용 (자동 실행 모드)
-# Spiral 0-B 이후 Claude Code task 단위 분리 기준 (경로는 src/ 기준)
+## 빌드 분해 (AI 페어 작업 단위)
+# 빌드를 독립 구현·테스트 가능한 작업 단위로 분해한 기준 (경로는 src/ 기준)
 task_units:
   - src/core/llm_client.py       ← 독립 구현·테스트 가능
   - src/core/serper_client.py    ← 독립 구현·테스트 가능
@@ -77,7 +74,7 @@ read_before_impl:
 - 회장 보고 조건 단독 결정 금지 (이유: 비용·법적·실행 전환은 반드시 핑구 승인)
 - 파일 작성·변경 전 내용 요약 → 핑구 승인 후 작성 (이유: 방향 오류 사전 차단)
 - 세션 종료 시 ADR·review 반드시 작성 (이유: 결정사항 누락 방지)
-- 한글 포함 파일은 Edit/Write/PowerShell 금지 → Python write_text(encoding="utf-8") 전용 (이유: CJK 코드포인트 혼입, 세부 규칙 → .claude/lessons.md)
+- 한글 포함 파일은 Edit/Write/PowerShell 금지 → Python write_text(encoding="utf-8") 전용 (이유: CJK 코드포인트 혼입)
 - 실행 전 원인 분석 먼저 — 같은 파일 3회 이상 재작성 시 즉시 중단 후 근본 원인 파악
 - 사용자 피드백 수신 즉시 기존 파일 전체 검증 후 다음 작업 진행
 
