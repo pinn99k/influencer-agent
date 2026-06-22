@@ -24,7 +24,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routes import ceo, stream, decision, reports, reanalyze, interview, plan, chat, measure
+from api.routes import ceo, stream, decision, reports, reanalyze, interview, plan, chat, measure, manager
 from api.session_manager import SessionManager
 from core.config import API_HOST, API_PORT
 
@@ -58,6 +58,7 @@ app.include_router(reanalyze.router, prefix="/api", tags=["reanalyze"])
 app.include_router(interview.router, prefix="/api", tags=["interview"])
 app.include_router(chat.router, prefix="/api", tags=["chat"])
 app.include_router(measure.router, prefix="/api", tags=["measure"])
+app.include_router(manager.router, prefix="/api", tags=["manager"])
 
 static_dir = Path(__file__).parent / "static"
 

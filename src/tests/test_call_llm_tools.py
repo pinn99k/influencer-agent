@@ -4,7 +4,8 @@ from unittest.mock import patch, MagicMock
 from core.llm_client import call_llm_tools
 
 
-def test_passes_tools_and_returns_message():
+def test_passes_tools_and_returns_message(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "test-dummy-key")
     msg = {"role": "assistant", "content": None,
            "tool_calls": [{"id": "c1", "type": "function",
                            "function": {"name": "run_subject_analysis", "arguments": "{}"}}]}

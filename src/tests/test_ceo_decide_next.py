@@ -71,8 +71,10 @@ class TestDecideNextSequential:
         assert result["action"] == "run"
         assert result["target"] == "경쟁분석"
 
-    def test_uses_llm_for_decision(self, ceo):
+    def test_uses_llm_for_decision(self, ceo, monkeypatch):
         """CEO LLM 판단 복원 — _decide_next가 LLM을 호출한다."""
+        monkeypatch.setenv("OPENAI_API_KEY", "test-dummy-key")
+        monkeypatch.setenv("GROQ_API_KEY", "test-dummy-key")
         context = {**SAMPLE_CONTEXT}
         mock_resp = MagicMock()
         mock_resp.status_code = 200

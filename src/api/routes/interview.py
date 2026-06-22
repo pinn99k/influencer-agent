@@ -100,6 +100,7 @@ class ConfirmRequest(BaseModel):
     approved: bool = True
     corrections: dict | None = None
     start_job: bool = True
+    mode: str = "linear"  # "linear" | "autonomous" (2장 자율 도구 루프)
 
 
 @router.post("/interview/confirm")
@@ -127,7 +128,8 @@ async def interview_confirm(req: ConfirmRequest):
         # first analysis already reflects it (U3).
         _save_direction_if_any(engine, subject)
         try:
-            job_id = _session_mgr.start_job(subject)
+            mode = req.mode if req.mode in ("linear", "autonomous") else "linear"
+            job_id = _session_mgr.start_job(subject, mode=mode)
         except RuntimeError as e:
             raise HTTPException(status_code=429, detail=str(e))
         result["job_id"] = job_id

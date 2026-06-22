@@ -49,6 +49,7 @@ const Actions = {
       localStorage.removeItem('ceo_influencer');
     } catch {}
     if (API._closeStream) API._closeStream();
+    if (typeof clearMdCache === 'function') clearMdCache();
     State.appointed = false;
     State.persona = null;
     State.currentJobId = null;
@@ -59,6 +60,7 @@ const Actions = {
     State.plan = null;
     State.ceoState = 'thinking';
     State.reanalyzeMode = false;
+    State.runMode = 'linear';   // 새 대상자는 항상 선형으로 시작 (자율 토글 끈적임 방지)
     State.subjects = [];
     State.selectedSubject = null;
     State.feedbackContent = '';
@@ -114,6 +116,8 @@ const Actions = {
           State.notify();
         }
       } catch (_) {}
+      // Restore manager notifications from disk (live SSE only fills these otherwise).
+      await Actions.restoreManagerNotes(name);
     }
 
     if (!State.currentJobId) return;
@@ -280,7 +284,7 @@ const Actions = {
     iv.pending = true;
     State.notify();
     try {
-      const data = await API.interviewConfirm(iv.id, true, null, true);
+      const data = await API.interviewConfirm(iv.id, true, null, true, State.runMode || 'linear');
 
       // Case A: not submittable yet — dialogue stays alive, CEO asks for more.
       if (data && data.approved === false) {
@@ -434,6 +438,7 @@ const Actions = {
   async openSubject(name) {
     if (!name) return;
     if (API._closeStream) API._closeStream();
+    if (typeof clearMdCache === 'function') clearMdCache();
     State.currentJobId = null;
     State.influencerName = name;
     State.persona = { '이름': name };
@@ -468,7 +473,25 @@ const Actions = {
           role: m.role === 'assistant' ? 'ceo' : 'user', text: m.content }));
       }
     } catch (_) {}
+    await Actions.restoreManagerNotes(name);
     State.notify();
+  },
+
+  // 매니저 알림 디스크 복원 — 라이브 SSE가 아니면 비어버리는 패널을 채운다.
+  // 비어있을 때만 채워 라이브 이벤트와 중복을 피한다.
+  async restoreManagerNotes(name) {
+    const target = name || State.influencerName;
+    if (!target) return;
+    if ((State.managerNotes || []).length > 0) return;
+    try {
+      const data = await API.managerNotes(target);
+      const notes = (data && data.notes) || [];
+      State.managerNotes = notes.map(n => ({
+        t: n.t || '저장됨', kind: n.kind || 'info',
+        week: n.week || null, content: n.content || '',
+      }));
+      State.notify();
+    } catch (_) {}
   },
 
   pushActivity(evt) {
@@ -546,6 +569,7 @@ const Actions = {
 
   async _loadReports() {
     if (!State.influencerName) return;
+    if (typeof clearMdCache === 'function') clearMdCache();
     try {
       const data = await API.listReports(State.influencerName);
       State.reports = (data.reports || []).map((fname, i) => ({

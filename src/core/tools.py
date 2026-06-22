@@ -62,11 +62,13 @@ WORKER_TOOLS = [
 
 
 class ToolExecutor:
-    def __init__(self, context: dict, planning_dept, event_emitter=None, result_chars: int = 1800):
+    def __init__(self, context: dict, planning_dept, event_emitter=None,
+                 result_chars: int = 1800, measure_store=None):
         self.context = context
         self.dept = planning_dept
         self._emitter = event_emitter
         self.result_chars = result_chars
+        self._measure = measure_store
         self.finished = False
         self.finish_summary = ""
         self.ran: list = []
@@ -102,6 +104,20 @@ class ToolExecutor:
             self.context[k] = v
         if agent_name not in self.ran:
             self.ran.append(agent_name)
+
+        # Provenance: 모델이 스스로 이 워커를 호출하기로 결정 -> AI 결정으로 기록(감사용).
+        # 측정은 절대 파이프라인을 깨면 안 된다 -> 예외 삼킴.
+        if self._measure is not None:
+            try:
+                from core.measure import DecisionEntry, ACTOR_AI
+                passed = dept_result.validation_results.get(agent_name, {}).get("passed", True)
+                self._measure.log_decision(DecisionEntry(
+                    actor=ACTOR_AI,
+                    basis=("focus: " + focus) if focus else "자율 루프 도구 선택",
+                    decision=(agent_name + " 실행") + ("" if passed else " (검증 미통과)"),
+                ))
+            except Exception as e:
+                print("[ToolExecutor] 측정 로그 실패 (" + str(e) + ")")
 
         ck = self.dept.agents[agent_name].context_key
         content = dept_result.agent_results.get(ck, "") or "(빈 결과)"

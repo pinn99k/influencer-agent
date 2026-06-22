@@ -208,6 +208,11 @@ class CEO:
         if self.dry_run:
             return {"iterations": 0, "finished": False, "ran": [], "messages": []}
 
+        # run() 과 동일하게 성과·방향을 주입한다(자율 모드도 사용자 방향을 반영해야 함).
+        perf = self.fm.load_performance_record()
+        if perf:
+            context["성과_기록"] = perf
+        self._load_direction(context)
         self._build_ceo_summary(context)
         system = self._prompts.load_prompt("ceo/autonomous")
         subject_json = json.dumps(context["대상자"], ensure_ascii=False, indent=2)
@@ -221,7 +226,11 @@ class CEO:
             "도구를 사용해 분석을 진행하고, 모두 끝나면 finish를 호출하세요.",
         ])
 
-        executor = ToolExecutor(context, self._planning_dept, event_emitter=self._emitter)
+        from core.measure import MeasureStore
+        executor = ToolExecutor(
+            context, self._planning_dept,
+            event_emitter=self._emitter, measure_store=MeasureStore(self.fm.name),
+        )
         loop = AgentLoop(
             executor, WORKER_TOOLS, system,
             provider="openai", model="gpt-4o", max_iter=8,
@@ -233,6 +242,7 @@ class CEO:
             self._state_mgr.update_agent(agent_name, "DONE")
         self._emit("pipeline_completed", {
             "ran": loop_result["ran"], "iterations": loop_result["iterations"],
+            "stop_reason": loop_result.get("stop_reason"),
         })
         self._finalize(context)
         return loop_result
@@ -510,6 +520,7 @@ class CEO:
             "경쟁_분석": context.get("경쟁_분석", ""),
             "플랫폼_추천": context.get("플랫폼_추천", ""),
             "컨셉_기획": context.get("컨셉_기획", ""),
+            "성과_기록": context.get("성과_기록", ""),
             "방향": context.get("방향", ""),
         }
         try:

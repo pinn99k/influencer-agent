@@ -32,13 +32,13 @@ class AgentLoop:
             {"role": "user", "content": user_msg},
         ]
         iterations = 0
-        hit_max = True
+        stop_reason = "max_iter"   # overwritten when the loop stops cleanly
         for iterations in range(1, self.max_iter + 1):
             msg = call_llm_tools(self.provider, self.model, self.messages, self.tools)
             self.messages.append(msg)
             tool_calls = msg.get("tool_calls") or []
             if not tool_calls:
-                hit_max = False
+                stop_reason = "no_tool"
                 break
             for tc in tool_calls:
                 fn = (tc.get("function") or {}).get("name", "")
@@ -55,13 +55,15 @@ class AgentLoop:
                     "content": result,
                 })
             if self.executor.finished:
-                hit_max = False
+                stop_reason = "finish"
                 break
-        if hit_max:
+        if stop_reason == "max_iter":
             self._emit("loop_max_iter", {"max_iter": self.max_iter})
+        self._emit("loop_stopped", {"reason": stop_reason, "iterations": iterations})
         return {
             "iterations": iterations,
             "finished": self.executor.finished,
             "ran": list(self.executor.ran),
+            "stop_reason": stop_reason,
             "messages": self.messages,
         }

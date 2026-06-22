@@ -8,7 +8,7 @@
 - 언어: Python 3.11+ · 프레임워크 없음
 - 생성 모델: gpt-4o · 품질 채점: Groq · 검색: Serper
 - 인터페이스: CLI + 웹(FastAPI + SSE)
-- 테스트: 373 passing
+- 테스트: 392 passing (391 + 1 live test skipped without API key)
 
 ---
 
@@ -52,7 +52,7 @@ CEO(경영)         목표 해석, 부서 임명, 결과 취합, 품질 검토, 
 | 재분석 루프 | 성과/피드백 입력 -> CEO가 어떤 분석을 다시 돌릴지 판단 -> 부분 재실행 |
 | 매니저 알림 | 주간 실행 카드 / 진행 보고 / 성과 입력 요청 / 완료 요약 |
 
-**검증 수치 (레포 확인):** 테스트 373 passing · 워커 4종 실 LLM E2E 품질 85~90/100
+**검증 수치 (레포 확인):** 테스트 392 passing (391 + 1 live test skipped without API key) · 워커 4종 실 LLM E2E 품질 85~90/100
 (대상90/경쟁85/플랫폼90/컨셉85, gpt-4o 생성 + LLM 저지 채점) · 아키텍처 결정 ADR 32건.
 
 **최근 진행 (세션 35~36):** 도구 호출 루프 프리미티브(`call_llm_tools` + `ToolExecutor` + `agent_loop`)를
@@ -97,7 +97,7 @@ python -m uvicorn api.main:app --port 8000
 ### 테스트
 ```bash
 cd src
-python -m pytest -q          # 373 passing
+python -m pytest -q          # 392 passing (391 + 1 live test skipped without API key)
 ```
 
 ### 결과물 위치

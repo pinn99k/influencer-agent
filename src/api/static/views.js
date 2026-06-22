@@ -730,6 +730,8 @@ function viewBriefing(briefingId) {
 //  REPORT viewer (산출물 별도 창 — 토글 오버레이)
 // ════════════════════════════════════════════════════
 const MD_CACHE = {};
+function _mdKey(name, file) { return (name || '') + '|' + file; }
+function clearMdCache() { for (const k in MD_CACHE) delete MD_CACHE[k]; }
 async function viewReport(reportId) {
   const view = h('div', { class: 'report-view' });
   const active = reportId || (State.reports[0] && State.reports[0].id);
@@ -770,15 +772,16 @@ async function viewReport(reportId) {
   view.appendChild(body);
 
   const name = State.influencerName;
-  if (name && !MD_CACHE[active]) {
+  const cacheKey = _mdKey(name, active);
+  if (name && !MD_CACHE[cacheKey]) {
     try {
       const data = await API.getReport(name, active);
-      MD_CACHE[active] = data.content || data;
+      MD_CACHE[cacheKey] = data.content || data;
     } catch (_) {
-      MD_CACHE[active] = '# 로딩 실패\n\n백엔드에서 산출물을 가져올 수 없습니다.';
+      MD_CACHE[cacheKey] = '# 로딩 실패\n\n백엔드에서 산출물을 가져올 수 없습니다.';
     }
   }
-  const md = MD_CACHE[active] || '# 데모 모드\n\n백엔드 미연결.';
+  const md = MD_CACHE[cacheKey] || '# 데모 모드\n\n백엔드 미연결.';
   $('.md-body', mdWrap).innerHTML = renderMd(md);
   return view;
 }
@@ -843,8 +846,12 @@ function viewInterview() {
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
 
   const confirmBar = iv.canSubmit
-    ? h('div', { class: 'confirm-bar' },
+    ? h('div', { class: 'confirm-bar', style: 'flex-direction:column;align-items:stretch;gap:9px' },
         h('span', null, '필요한 정보가 모였어요. 이대로 분석을 시작할까요?'),
+        h('label', { class: 'mode-toggle', style: 'display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:var(--fg-muted);cursor:pointer' },
+          h('input', { type: 'checkbox', style: 'flex-shrink:0', checked: State.runMode === 'autonomous',
+            onchange: (e) => { State.runMode = e.target.checked ? 'autonomous' : 'linear'; State.notify(); } }),
+          h('span', null, '자율 모드 — CEO가 도구를 스스로 호출 (2장 도구 루프)')),
         h('button', { class: 'btn primary sm', onclick: () => Actions.confirmInterview(), disabled: iv.pending }, '확정하고 분석 시작 →'))
     : h('div', { class: 'confirm-bar muted' },
         h('span', null, '대화를 이어가 주세요. 성함과 핵심 정보가 모이면 분석을 시작할 수 있어요.'));

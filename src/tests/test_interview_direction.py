@@ -98,7 +98,7 @@ class FakeEngineWithDirection:
 @pytest.fixture
 def client(monkeypatch):
     interview_mod.init_router(main_mod.session_mgr, engine_factory=FakeEngineWithDirection)
-    monkeypatch.setattr(main_mod.session_mgr, "start_job", lambda subject: "fakejob")
+    monkeypatch.setattr(main_mod.session_mgr, "start_job", lambda subject, mode="linear": "fakejob")
     yield TestClient(main_mod.app)
     interview_mod.init_router(main_mod.session_mgr, engine_factory=None)
     if DIR_BASE.exists():

@@ -3,7 +3,7 @@ import io
 import argparse
 
 # Windows: stdin/stdout UTF-8 강제 (cp949 surrogate 에러 방지)
-if sys.platform == "win32":
+if sys.platform == "win32" and "pytest" not in sys.modules:  # skip under pytest (rewrap breaks capture)
     sys.stdin = io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8", errors="replace")
     sys.stdout = io.TextIOWrapper(
         sys.stdout.buffer, encoding="utf-8", errors="replace", line_buffering=True
@@ -136,6 +136,11 @@ def main():
         action="store_true",
         help="CEO 대화형 인터뷰로 정보 수집 (기본값)",
     )
+    parser.add_argument(
+        "--autonomous",
+        action="store_true",
+        help="자율 도구 호출 루프로 분석 (CEO가 도구를 스스로 골라 호출 -- 2장 Phase 2)",
+    )
     args = parser.parse_args()
 
     # ── 템플릿 생성 전용 모드 ──
@@ -202,7 +207,11 @@ def main():
         print(f"\n[dry_run 모드] API 호출 없이 프롬프트 파일을 저장합니다.")
         print(f"저장 위치: outputs/{subject['이름']}/.system/prompts/\n")
 
-    ceo.run(context)
+    if args.autonomous and not args.dry_run:
+        print("\n[자율 모드] CEO가 도구를 스스로 골라 호출합니다 (2장 Phase 2).")
+        ceo.run_autonomous(context)
+    else:
+        ceo.run(context)
 
     if args.dry_run:
         print(f"\n완료. outputs/{subject['이름']}/.system/prompts/ 에서 프롬프트를 확인하세요.")

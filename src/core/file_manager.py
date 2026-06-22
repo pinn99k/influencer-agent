@@ -95,6 +95,39 @@ class FileManager:
         path.write_text(content, encoding="utf-8")
         return path
 
+    def load_manager_outputs(self) -> list[dict]:
+        """매니저 산출물(.system/manager/*.md)을 알림 형태로 복원한다.
+
+        라이브 SSE 이벤트가 아니면 매니저 패널이 비므로 디스크에서 복원한다.
+        파일명 접두사로 종류(kind)와 주차(week)를 추론한다. 완료 요약은
+        디스크에 저장되지 않으므로 복원 대상이 아니다."""
+        mdir = self.base / ".system" / "manager"
+        if not mdir.exists():
+            return []
+        notes = []
+        for p in sorted(mdir.glob("*.md")):
+            stem = p.stem
+            if stem.startswith("weekly_card"):
+                kind = "weekly_card"
+            elif stem.startswith("performance_request"):
+                kind = "performance_request"
+            elif stem.startswith("progress_report"):
+                kind = "progress"
+            else:
+                kind = "info"
+            m = re.search(r"week(\d+)", stem)
+            week = int(m.group(1)) if m else None
+            try:
+                mtime = datetime.datetime.fromtimestamp(
+                    p.stat().st_mtime).strftime("%H:%M:%S")
+            except OSError:
+                mtime = ""
+            notes.append({
+                "kind": kind, "week": week,
+                "content": p.read_text(encoding="utf-8"), "t": mtime,
+            })
+        return notes
+
     def save_prompt_output(self, name: str, content: str) -> None:
         """Spiral 0-A 전용 — .system/prompts/ 에 프롬프트 파일 저장."""
         path = self.base / ".system" / "prompts" / f"{name}.md"

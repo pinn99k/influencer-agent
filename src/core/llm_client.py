@@ -87,7 +87,15 @@ def call_llm(
     last_resp = None
     last_status = None
     for attempt in range(max_retries + 1):
-        last_resp = requests.post(url, headers=headers, json=payload, timeout=LLM_TIMEOUT)
+        try:
+            last_resp = requests.post(url, headers=headers, json=payload, timeout=LLM_TIMEOUT)
+        except requests.exceptions.RequestException as conn_err:
+            if attempt < max_retries:
+                wait = min(5 * (attempt + 1), 30)
+                print(f"[connection error] {conn_err} -> {wait}s retry ({attempt + 1}/{max_retries})...")
+                time.sleep(wait)
+                continue
+            raise
         if last_resp.status_code in (429, 503):
             last_status = last_resp.status_code
             if attempt < max_retries:
@@ -153,7 +161,15 @@ def call_llm_messages(
     last_resp = None
     last_status = None
     for attempt in range(max_retries + 1):
-        last_resp = requests.post(url, headers=headers, json=payload, timeout=LLM_TIMEOUT)
+        try:
+            last_resp = requests.post(url, headers=headers, json=payload, timeout=LLM_TIMEOUT)
+        except requests.exceptions.RequestException as conn_err:
+            if attempt < max_retries:
+                wait = min(5 * (attempt + 1), 30)
+                print(f"[connection error] {conn_err} -> {wait}s retry ({attempt + 1}/{max_retries})...")
+                time.sleep(wait)
+                continue
+            raise
         if last_resp.status_code in (429, 503):
             last_status = last_resp.status_code
             if attempt < max_retries:
@@ -220,7 +236,15 @@ def call_llm_tools(
     last_resp = None
     last_status = None
     for attempt in range(max_retries + 1):
-        last_resp = requests.post(url, headers=headers, json=payload, timeout=LLM_TIMEOUT)
+        try:
+            last_resp = requests.post(url, headers=headers, json=payload, timeout=LLM_TIMEOUT)
+        except requests.exceptions.RequestException as conn_err:
+            if attempt < max_retries:
+                wait = min(5 * (attempt + 1), 30)
+                print(f"[connection error] {conn_err} -> {wait}s retry ({attempt + 1}/{max_retries})...")
+                time.sleep(wait)
+                continue
+            raise
         if last_resp.status_code in (429, 503):
             last_status = last_resp.status_code
             if attempt < max_retries:

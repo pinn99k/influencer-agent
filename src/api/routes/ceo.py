@@ -17,6 +17,7 @@ def init_router(session_manager):
 
 class StartRequest(BaseModel):
     subject: dict
+    mode: str = "linear"  # "linear" | "autonomous" (2장 자율 도구 루프)
 
     @field_validator("subject")
     @classmethod
@@ -30,11 +31,12 @@ class StartRequest(BaseModel):
 
 @router.post("/start")
 async def start_run(request: StartRequest):
+    mode = request.mode if request.mode in ("linear", "autonomous") else "linear"
     try:
-        job_id = _session_mgr.start_job(request.subject)
+        job_id = _session_mgr.start_job(request.subject, mode=mode)
     except RuntimeError as e:
         raise HTTPException(status_code=429, detail=str(e))
-    return {"job_id": job_id, "status": "started"}
+    return {"job_id": job_id, "status": "started", "mode": mode}
 
 
 @router.get("/status")

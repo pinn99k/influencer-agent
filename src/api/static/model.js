@@ -17,6 +17,7 @@ const State = {
   activityTab: 'timeline',  // 'timeline' or 'agents'
   agentDetail: null,  // {agent, content} when modal is open
   entryTab: 'interview',     // 'interview' | 'new' | 'reanalyze'
+  runMode: 'linear',         // 'linear'=1장 고정 파이프라인 | 'autonomous'=2장 도구 루프
   interview: null,           // active interview session
   managerNotes: [],          // manager notifications
   reanalyzeMode: false,

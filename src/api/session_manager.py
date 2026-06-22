@@ -16,6 +16,7 @@ class JobContext:
     job_id: str
     influencer_name: str
     subject: dict
+    mode: str = "linear"  # "linear"=1장 고정 파이프라인 | "autonomous"=2장 도구 루프
     sse_queue: queue.Queue = field(default_factory=queue.Queue)
     decision_event: threading.Event = field(default_factory=threading.Event)
     decision_store: dict = field(default_factory=dict)
@@ -32,7 +33,7 @@ class SessionManager:
         self._jobs: dict[str, JobContext] = {}
         self._lock = threading.Lock()
 
-    def start_job(self, subject: dict) -> str:
+    def start_job(self, subject: dict, mode: str = "linear") -> str:
         with self._lock:
             running = sum(1 for j in self._jobs.values() if j.status == "running")
             if running >= MAX_CONCURRENT_JOBS:
@@ -40,7 +41,7 @@ class SessionManager:
 
         job_id = uuid.uuid4().hex[:12]
         name = subject.get("이름", "unknown")
-        job = JobContext(job_id=job_id, influencer_name=name, subject=subject)
+        job = JobContext(job_id=job_id, influencer_name=name, subject=subject, mode=mode)
 
         t = threading.Thread(target=self._run_ceo, args=(job,), daemon=True)
         job.thread = t
@@ -97,10 +98,14 @@ class SessionManager:
 
             context = self._init_context(job.subject)
             ceo = CEO(fm, dry_run=False, event_emitter=emitter)
-            ceo.run(context)
+            # mode 분기: 2장 자율 도구 루프(run_autonomous) vs 1장 고정 파이프라인(run).
+            if job.mode == "autonomous":
+                ceo.run_autonomous(context)
+            else:
+                ceo.run(context)
 
             job.status = "completed"
-            emitter.emit("job_completed", {"job_id": job.job_id})
+            emitter.emit("job_completed", {"job_id": job.job_id, "mode": job.mode})
         except Exception as e:
             job.status = "failed"
             job.error = str(e)

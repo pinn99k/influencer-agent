@@ -65,7 +65,7 @@ class FakeEngine:
 @pytest.fixture
 def client(monkeypatch):
     interview_mod.init_router(main_mod.session_mgr, engine_factory=FakeEngine)
-    monkeypatch.setattr(main_mod.session_mgr, "start_job", lambda subject: "fakejob123")
+    monkeypatch.setattr(main_mod.session_mgr, "start_job", lambda subject, mode="linear": "fakejob123")
     yield TestClient(main_mod.app)
     interview_mod.init_router(main_mod.session_mgr, engine_factory=None)
 

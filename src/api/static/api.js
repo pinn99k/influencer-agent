@@ -61,6 +61,11 @@ const API = {
     return this._req('/plan/' + encodeURIComponent(name));
   },
 
+  /** GET /api/manager/{name} — 매니저 알림 디스크 복원 */
+  managerNotes(name) {
+    return this._req('/manager/' + encodeURIComponent(name));
+  },
+
   /** GET /api/subjects — 기존 대상자 목록 */
   listSubjects() { return this._req('/subjects'); },
 
@@ -155,12 +160,13 @@ const API = {
   },
 
   /** POST /api/interview/confirm */
-  interviewConfirm(id, approved, corrections, startJob) {
+  interviewConfirm(id, approved, corrections, startJob, mode) {
     return this._req('/interview/confirm', {
       method: 'POST',
       body: JSON.stringify({
         interview_id: id, approved: approved !== false,
         corrections: corrections || null, start_job: startJob !== false,
+        mode: mode || 'linear',
       }),
     });
   },
